@@ -22,7 +22,7 @@ information ([link](https://kubernetes.io/docs/concepts/configuration/secret/#mo
 
 ### Step 1 - Create Original Secret
 ```console
-make step1
+$ make step1
 yq r secret.yml -j | jq ".data[\"secret.txt\"]=\"$(base64 original-secret.txt)\"" |  yq r -P - > original-secret.yml
 kubectl apply -f ./original-secret.yml
 secret/the-secret created
