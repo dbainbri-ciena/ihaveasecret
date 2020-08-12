@@ -45,7 +45,7 @@ added-secret.yml: modified-secret.yml added-secret.txt
 	yq r modified-secret.yml -j | jq ".data[\"added-secret.txt\"]=\"$$(base64 added-secret.txt)\"" | yq r -P - > added-secret.yml
 
 deleted-secret.yml: added-secret.yml
-	yq r added-secret.yml -j | jq 'del(.data["added-secret.txt"])' | yq r -P - > deleted-secret.yml
+	yq r added-secret.yml -j | jq 'del(.data["secret.txt","added-secret.txt"])' | yq r -P - > deleted-secret.yml
 
 secret: original-secret.yml
 	kubectl apply -f ./original-secret.yml

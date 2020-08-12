@@ -39,16 +39,16 @@ pod/tell-the-secret created
 ```console
 $ make step3
 kubectl logs --tail 10 pod/tell-the-secret
-  - cat: can't open '/var/my-secret/added-secret.txt': No such file or directory
-2020-08-11T18:56:15Z:
-  - This is the original secret
-  - cat: can't open '/var/my-secret/added-secret.txt': No such file or directory
-2020-08-11T18:56:18Z:
-  - This is the original secret
-  - cat: can't open '/var/my-secret/added-secret.txt': No such file or directory
-2020-08-11T18:56:21Z:
-  - This is the original secret
-  - cat: can't open '/var/my-secret/added-secret.txt': No such file or directory
+  mounts:
+    - secret: "This is the original secret"
+    - added: "cat: can't open '/var/my-secret/added-secret.txt': No such file or directory"
+2020-08-12T17:43:34Z:
+  environment:
+    - secret: "This is the original secret"
+    - added: ""
+  mounts:
+    - secret: "This is the original secret"
+    - added: "cat: can't open '/var/my-secret/added-secret.txt': No such file or directory"
 ```
 
 ### Step 4 - Modify Secret
@@ -67,16 +67,16 @@ several minutes for the POD to "see" the change. you can use `make follow` to
 ```console
 $ make step5
 kubectl logs --tail 10 pod/tell-the-secret
-  - cat: can't open '/var/my-secret/added-secret.txt': No such file or directory
-2020-08-11T18:57:27Z:
-  - This is the original secret
-  - cat: can't open '/var/my-secret/added-secret.txt': No such file or directory
-2020-08-11T18:57:30Z:
-  - This is the original secret
-  - cat: can't open '/var/my-secret/added-secret.txt': No such file or directory
-2020-08-11T18:57:33Z:
-  - This is the modified secret
-  - cat: can't open '/var/my-secret/added-secret.txt': No such file or directory
+  mounts:
+    - secret: "This is the modified secret"
+    - added: "cat: can't open '/var/my-secret/added-secret.txt': No such file or directory"
+2020-08-12T17:46:04Z:
+  environment:
+    - secret: "This is the original secret"
+    - added: ""
+  mounts:
+    - secret: "This is the modified secret"
+    - added: "cat: can't open '/var/my-secret/added-secret.txt': No such file or directory"
 ```
 
 ### Step 6 - Add Additional Secret
@@ -95,22 +95,22 @@ several minutes for the POD to "see" the change. you can use `make follow` to
 ```console
 $ make step7
 kubectl logs --tail 10 pod/tell-the-secret
-  - cat: can't open '/var/my-secret/added-secret.txt': No such file or directory
-2020-08-11T18:58:51Z:
-  - This is the modified secret
-  - cat: can't open '/var/my-secret/added-secret.txt': No such file or directory
-2020-08-11T18:58:54Z:
-  - This is the modified secret
-  - cat: can't open '/var/my-secret/added-secret.txt': No such file or directory
-2020-08-11T18:58:57Z:
-  - This is the modified secret
-  - This is the added secret
+  mounts:
+    - secret: "This is the modified secret"
+    - added: "cat: can't open '/var/my-secret/added-secret.txt': No such file or directory"
+2020-08-12T17:49:58Z:
+  environment:
+    - secret: "This is the original secret"
+    - added: ""
+  mounts:
+    - secret: "This is the modified secret"
+    - added: "This is the added secret"
 ```
 
 ### Step 8 - Delete Additional Secret
 ```console
 $ make step8
-yq r added-secret.yml -j | jq 'del(.data["added-secret.txt"])' | yq r -P - > deleted-secret.yml
+yq r added-secret.yml -j | jq 'del(.data["secret.txt","added-secret.txt"])' | yq r -P - > deleted-secret.yml
 kubectl apply -f ./deleted-secret.yml
 secret/the-secret configured
 ```
@@ -123,16 +123,16 @@ several minutes for the POD to "see" the change. you can use `make follow` to
 ```console
 $ make step9
 kubectl logs --tail 10 pod/tell-the-secret
-  - This is the added secret
-2020-08-11T19:00:00Z:
-  - This is the modified secret
-  - This is the added secret
-2020-08-11T19:00:03Z:
-  - This is the modified secret
-  - This is the added secret
-2020-08-11T19:00:06Z:
-  - This is the modified secret
-  - cat: can't open '/var/my-secret/added-secret.txt': No such file or directory
+  mounts:
+    - secret: "This is the modified secret"
+    - added: "This is the added secret"
+2020-08-12T17:52:14Z:
+  environment:
+    - secret: "This is the original secret"
+    - added: ""
+  mounts:
+    - secret: "cat: can't open '/var/my-secret/secret.txt': No such file or directory"
+    - added: "cat: can't open '/var/my-secret/added-secret.txt': No such file or directory"
 ```
 
 ### Step 10 - Tear It All Down
